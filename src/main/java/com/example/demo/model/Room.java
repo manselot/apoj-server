@@ -104,4 +104,18 @@ public class Room {
         }
         return s.toString();
     }
+    public void setScore(int score1,int score2,int score3,int score4) {
+        int[] score = {score1,score2,score3,score4};
+        for (int i = 0; i < members.size(); i++){
+            members.get(i).setScore(score[i]);
+        }
+    }
+
+    public String getMembersResult() {
+        StringBuilder s = new StringBuilder();
+        for (Member m : members) {
+            s.append(m.getName()).append(":").append(m.getScore()).append(",");
+        }
+        return s.toString();
+    }
 }

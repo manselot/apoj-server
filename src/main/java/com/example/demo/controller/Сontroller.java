@@ -12,10 +12,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -52,8 +55,6 @@ public class Сontroller {
                 if (!uploadDir.exists()) {
                     uploadDir.mkdir();
                 }
-                String uuidFile = UUID.randomUUID().toString();
-                String resultFilename = uuidFile + "." + file.getOriginalFilename();
                 for (Room r : lobby) {
                     if (Integer.valueOf(id) == r.getId()) {
                         r.addSong(file.getOriginalFilename());
@@ -130,14 +131,51 @@ public class Сontroller {
 
         m.addAnswer(ans);
     }
-
-    @GetMapping("/GetAnswer/{id}")
-    public String getAnswer(@PathVariable int id){
+    @PostMapping("/Result")
+    public void addResult(@RequestParam("score1") int score1,
+                          @RequestParam("score2") int score2,
+                          @RequestParam("score3") int score3,
+                          @RequestParam("score3") int score4,
+                          @RequestParam("id") int id){
         Room r =Room.findRoom(lobby,id);
         if(r == null) {
             throw new NullPointerException();
         }
+        r.setScore(score1,score2,score3,score4);
+    }
+
+    @GetMapping("/GetResult/{id}")
+    public String getResult(@PathVariable int id){
+        Room r =Room.findRoom(lobby,id);
+        if(r == null) {
+            throw new NullPointerException();
+        }
+        return r.getMembersResult();
+    }
+
+    @GetMapping("/GetAnswer/{id}")
+    public String getAnswer(@PathVariable int id){
+        Room r = Room.findRoom(lobby,id);
+        if(r == null) {
+            throw new NullPointerException();
+        }
         return r.getLastAnswer();
+    }
+
+    @PostMapping("/DeleteLobby")
+    public void deleteRoom(@RequestParam("id") int id) throws IOException {
+        Room r = Room.findRoom(lobby,id);
+        if(r == null) {
+            throw new NullPointerException();
+        }
+        lobby.remove(r);
+        try(Stream<Path> files = Files.list(Paths.get(uploadPath + id));){
+            files.map(Path::toFile).forEach(File::delete);
+        }
+        File file = new File(uploadPath + id);
+        file.delete();
+
+
     }
 
 

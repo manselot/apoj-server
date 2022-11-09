@@ -3,9 +3,16 @@ package com.example.demo.model;
 import java.util.ArrayList;
 
 public class Member {
+
     private String name;
     private int currentid;
     private boolean leader;
+
+    public int getScore() {
+        return score;
+    }
+
+    private int score;
     private ArrayList<String> answers = new ArrayList<>();
 
     public Member(String name, int currentid, boolean leader) {
@@ -38,5 +45,9 @@ public class Member {
             return "1";
         }
         return  answers.get(answers.size() - 1);
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 }
