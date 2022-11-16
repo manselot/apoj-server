@@ -30,7 +30,7 @@ public class Сontroller {
 
 
     @Value("${upload.path}")
-    private String uploadPath;
+    private static String uploadPath;
 
     ArrayList<Room> lobby = new ArrayList<Room>();
 
@@ -68,11 +68,11 @@ public class Сontroller {
 
     @GetMapping("/JoinLobby")
     public String getLobby() {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         for (Room r : lobby) {
-            s += r.getName() + ":" + r.getId() + ",";
+            s.append(r.getName()).append(":").append(r.getId()).append(",");
         }
-        return s;
+        return s.toString();
     }
 
     @PostMapping("/Join")
@@ -177,6 +177,15 @@ public class Сontroller {
 
 
     }
+    @PostMapping("/CloseHost")
+    public void closeHost(@RequestParam("id") int id) {
+
+        Room r = Room.findRoom(lobby,id);
+        if(r == null) {
+            throw new NullPointerException();
+        }
+        lobby.remove(r);
+    }
 
 
 
@@ -185,7 +194,7 @@ public class Сontroller {
             ZipOutputStream out = new ZipOutputStream(new FileOutputStream(dir+"song.zip"));
 
             for (MultipartFile file : files) {
-                File filename = new File("src/main/resources/targetFile.tmp");
+                File filename = new File(uploadPath+"targetFile.tmp");
                 try (OutputStream os = new FileOutputStream(filename)) {
                     os.write(file.getBytes());
                 }
